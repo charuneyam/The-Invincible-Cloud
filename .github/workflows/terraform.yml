@@ -16,7 +16,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform
+        working-directory: .
 
     steps:
       # Get AWS Credentials
@@ -28,7 +28,7 @@ jobs:
       
       # Clone the repo
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
