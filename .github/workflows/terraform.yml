@@ -23,7 +23,7 @@ jobs:
       - name: 'AWS Credentials'
         uses: aws-actions/configure-aws-credentials@v5
         with: 
-          aws-region: us-east-2
+          aws-region: us-east-1
           role-to-assume: arn:aws:iam::759775733638:role/Github_Workflows
       
       # Clone the repo
