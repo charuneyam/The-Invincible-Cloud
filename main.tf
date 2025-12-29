@@ -20,10 +20,10 @@ resource "aws_security_group" "allow_ssh" {
 }
 
 resource "aws_instance" "app_server" {
-    ami = "ami-082835799e9b652df"
-  instance_type = "t3.small"
-    key_name      = "ec2-virginia"
-    vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+  ami                    = "ami-082835799e9b652df"
+  instance_type          = "t3.small"
+  key_name               = "ec2-virginia"
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
 
   tags = {
     Name = "learn-terraform"
