@@ -28,7 +28,7 @@ jobs:
       
       # Clone the repo
       - name: Checkout
-        uses: actions/checkout@4
+        uses: actions/checkout@v4
       
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
