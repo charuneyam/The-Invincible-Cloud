@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "rohith-task2-2" ]
 
 jobs:
   build-and-push:
