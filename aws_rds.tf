@@ -1,4 +1,5 @@
 resource "aws_db_instance" "postgres" {
+  # count=0
   identifier = "rohith-task2-postgres"
 
   engine            = "postgres"
@@ -10,7 +11,7 @@ resource "aws_db_instance" "postgres" {
   username = var.db_username
   password = var.db_password
 
-  publicly_accessible = true
+  publicly_accessible = false
   skip_final_snapshot = true
   deletion_protection = false
 

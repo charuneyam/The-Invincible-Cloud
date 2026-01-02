@@ -17,7 +17,12 @@ override.tf.json
 **/.terraform/*
 *.tfstate
 
+#task2
 terraform.tfvars
 *.tfvars
 .terraform/
 .terraform.lock.hcl
+
+#for app
+.DS_Store
+

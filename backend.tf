@@ -5,5 +5,7 @@ terraform {
     region         = "us-east-1"
     dynamodb_table = "invincible-cloud-lock-table"
     encrypt        = true
+    profile        = "account_a"
+      
   }
 }

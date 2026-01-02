@@ -1,4 +1,5 @@
 resource "google_sql_database_instance" "postgres" {
+  # count=0
   name             = "rohith-task2-postgres"
   database_version = "POSTGRES_15"
   region           = var.gcp_region
