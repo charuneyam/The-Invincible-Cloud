@@ -1,13 +1,13 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.92"
-    }
-    digitalocean = {
-      source  = "digitalocean/digitalocean"
-      version = "~> 2.0"
-    }
+provider "aws" {
+  region = "us-east-1"
+
+  assume_role {
+    role_arn     = "arn:aws:iam::215446238483:role/TerraformRDSRole"
+    session_name = "TerraformSession"
   }
-  required_version = ">= 1.2"
+}
+
+provider "google" {
+  project = "the-invincible-cloud"
+  region  = "us-central1"
 }

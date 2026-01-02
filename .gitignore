@@ -16,3 +16,8 @@ override.tf.json
 *_override.tf.json
 **/.terraform/*
 *.tfstate
+
+terraform.tfvars
+*.tfvars
+.terraform/
+.terraform.lock.hcl
