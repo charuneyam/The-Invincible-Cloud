@@ -1,9 +1,15 @@
 provider "aws" {
+  profile="account_a"
   region = "us-east-1"
-  profile = "account_b" 
+}
+
+provider "aws" {
+  alias  = "account_c"
+  region = "ap-south-1"
+  profile="account_c"
 }
 
 provider "google" {
-  project = "the-invincible-cloud"
-  region  = "us-central1"
+  project = var.gcp_project_id
+  region  = "asia-south1"
 }

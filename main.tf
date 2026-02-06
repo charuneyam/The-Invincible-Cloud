@@ -35,3 +35,14 @@
 
 #   owners = ["099720109477"] # Canonical
 # }
+
+resource "google_container_cluster" "autopilot_cluster" {
+  name             = "invincible-gke-autopilot"
+  location         = "asia-south1"
+  enable_autopilot = true
+  
+  network = "projects/${var.gcp_project_id}/global/networks/gcp-vpc-vivin"
+  subnetwork = "projects/${var.gcp_project_id}/regions/${var.gcp_region}/subnetworks/gcp-subnet-vivin"
+  deletion_protection = false 
+}
+

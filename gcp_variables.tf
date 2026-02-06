@@ -1,6 +1,6 @@
 variable "gcp_project_id" {}
 variable "gcp_region" {
-  default = "us-central1"
+  default = "asia-south1"
 }
 
 variable "gcp_db_password" {

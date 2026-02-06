@@ -26,3 +26,12 @@ terraform.tfvars
 #for app
 .DS_Store
 
+#general variables
+variables.tf
+
+todo-secret.yaml
+aws_variables.tf
+gcp_variables.tf
+Invinciblecloud.pem
+rohith-key.pem
+k3s.yaml

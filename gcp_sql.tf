@@ -8,7 +8,7 @@ resource "google_sql_database_instance" "postgres" {
     tier = "db-f1-micro"
 
     database_flags {
-      name  = "logical_replication"
+      name  = "cloudsql.logical_decoding"
       value = "on"
     }
 
