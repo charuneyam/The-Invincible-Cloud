@@ -20,10 +20,8 @@ jobs:
 
       - name: Dry Run AWS Context (Simulation)
         run: |
-          helm install --dry-run aws-test ./k8s/charts/invincible-app \
-            --set service.type=NodePort
+          helm install --dry-run=client aws-test ./k8s/charts/invincible-app --set service.type=NodePort
 
       - name: Dry Run DO Context (Simulation)
         run: |
-          helm install --dry-run do-test ./k8s/charts/invincible-app \
-            --set service.type=LoadBalancer
+          helm install --dry-run=client do-test ./k8s/charts/invincible-app --set service.type=LoadBalancer

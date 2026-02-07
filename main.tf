@@ -9,7 +9,7 @@ resource "aws_instance" "k3s_master" {
   subnet_id                   = "subnet-06c824570449a79d1"
   key_name                    = "ec2-virginia"
   vpc_security_group_ids      = [aws_security_group.k3s_sg.id]
-  associate_public_ip_address = true 
+  associate_public_ip_address = true
 
   tags = {
     Name        = "k3s-master"
@@ -30,7 +30,7 @@ resource "aws_security_group" "k3s_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] 
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # Rule 2: K8s API from DigitalOcean
@@ -39,7 +39,7 @@ resource "aws_security_group" "k3s_sg" {
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # 192.168.96.0/20
+    cidr_blocks = ["0.0.0.0/0"] # 192.168.96.0/20
   }
 
   egress {
@@ -57,7 +57,7 @@ provider "digitalocean" {
 
 # Look up existing VPC
 data "digitalocean_vpc" "invincible" {
-  name = "Invincible"  
+  name = "Invincible"
 }
 
 data "digitalocean_kubernetes_versions" "current" {
