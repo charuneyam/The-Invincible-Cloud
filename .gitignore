@@ -27,7 +27,7 @@ terraform.tfvars
 .DS_Store
 
 #general variables
-variables.tf
+
 
 todo-secret.yaml
 aws_variables.tf
