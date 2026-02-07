@@ -16,3 +16,22 @@ override.tf.json
 *_override.tf.json
 **/.terraform/*
 *.tfstate
+
+#task2
+terraform.tfvars
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+
+#for app
+.DS_Store
+
+#general variables
+
+
+todo-secret.yaml
+aws_variables.tf
+gcp_variables.tf
+Invinciblecloud.pem
+rohith-key.pem
+k3s.yaml
