@@ -1,0 +1,33 @@
+name: Invincible Cloud Dry-Run
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'v3.11.1'
+
+      - name: Lint Chart
+        run: |
+          helm lint ./k8s/charts/invincible-app
+
+      - name: Dry Run AWS Context (Simulation)
+        run: |
+          helm template aws-test ./k8s/charts/invincible-app \
+            --set service.type=NodePort
+
+      - name: Dry Run DO Context (Simulation)
+        run: |
+          helm template do-test ./k8s/charts/invincible-app \
+            --set service.type=LoadBalancer
