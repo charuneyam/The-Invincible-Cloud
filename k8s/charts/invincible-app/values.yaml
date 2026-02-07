@@ -1,0 +1,22 @@
+# Default values for invincible-app.
+
+replicaCount: 2
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overridden by CI/CD pipeline usually
+  tag: "latest"
+
+service:
+  type: LoadBalancer # DO will give a Public IP; K3s (AWS) might need MetalLB or NodePort
+  port: 80
+  targetPort: 80
+
+resources: 
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
