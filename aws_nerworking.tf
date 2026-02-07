@@ -15,7 +15,7 @@ resource "aws_subnet" "aws_pub_subnet" {
   vpc_id                  = aws_vpc.aws_main.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true # Gives EC2 a public IP
-  availability_zone       = "ap-south-1a"
+  availability_zone       = var.aws_availability_zone
 }
 
 # 4. Route Table (Sends traffic to Internet Gateway)

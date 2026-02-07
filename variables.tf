@@ -85,3 +85,8 @@ variable "gcp_machine_type" {
   description = "GCP machine type (e2-micro is usually free tier eligible)"
   default     = "e2-micro"
 }
+
+variable "gcp_credentials_file" {
+  type      = string
+  sensitive = true
+}

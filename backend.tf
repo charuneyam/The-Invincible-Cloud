@@ -6,6 +6,5 @@ terraform {
     dynamodb_table = "invincible-cloud-lock-table"
     encrypt        = true
     profile        = "account_a"
-      
   }
 }
