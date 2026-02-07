@@ -18,10 +18,16 @@ jobs:
         with:
           version: 'v3.11.1'
 
+      - name: Lint Chart
+        run: |
+          helm lint ./k8s/charts/invincible-app
+
       - name: Dry Run AWS Context (Simulation)
         run: |
-          helm install --dry-run=client aws-test ./k8s/charts/invincible-app --set service.type=NodePort
+          helm template aws-test ./k8s/charts/invincible-app \
+            --set service.type=NodePort
 
       - name: Dry Run DO Context (Simulation)
         run: |
-          helm install --dry-run=client do-test ./k8s/charts/invincible-app --set service.type=LoadBalancer
+          helm template do-test ./k8s/charts/invincible-app \
+            --set service.type=LoadBalancer
