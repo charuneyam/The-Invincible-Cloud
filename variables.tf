@@ -3,27 +3,10 @@ variable "key_name" {
   type        = string
 }
 
-variable "aws_region" {
-  type        = string
-  description = "AWS region to deploy into"
-  default     = "ap-south-1"
-}
-
 variable "aws_availability_zone" {
   type        = string
   description = "AWS AZ for the public subnet"
   default     = "ap-south-1a"
-}
-
-variable "gcp_project_id" {
-  type        = string
-  description = "GCP project id"
-}
-
-variable "gcp_region" {
-  type        = string
-  description = "GCP region"
-  default     = "asia-south1"
 }
 
 variable "gcp_vpc_cidr" {
@@ -84,9 +67,4 @@ variable "gcp_machine_type" {
   type        = string
   description = "GCP machine type (e2-micro is usually free tier eligible)"
   default     = "e2-micro"
-}
-
-variable "gcp_credentials_file" {
-  type      = string
-  sensitive = true
 }

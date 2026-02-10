@@ -1,63 +1,154 @@
-## AWS
+## AWS - K3s Master Node for Kubernetes
 
-# # EC2 Instance
-# resource "aws_instance" "k3s_master" {
-#   ami                         = "ami-046985b76608d68cb"
-#   instance_type               = "t3.small"
-#   subnet_id                   = "subnet-06c824570449a79d1"
-#   key_name                    = "ec2-virginia"
-#   vpc_security_group_ids      = [aws_security_group.k3s_sg.id]
-#   associate_public_ip_address = true
+resource "aws_instance" "k3s_master" {
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t3.small"
+  subnet_id                   = data.aws_subnet.default.id
+  key_name                    = aws_key_pair.ec2_key.key_name
+  vpc_security_group_ids      = [aws_security_group.k3s_sg.id]
+  associate_public_ip_address = true
 
-#   tags = {
-#     Name        = "k3s-master"
-#     Environment = "Production"
-#     Role        = "K8s-Master"
-#   }
-# }
+  # Install K3s on instance startup
+  user_data = base64encode(<<-EOF
+              #!/bin/bash
+              set -e
+              echo "Starting K3s installation..."
+              curl -sfL https://get.k3s.io | sh -
+              echo "K3s installation complete"
+              EOF
+  )
 
-# # Security Group
-# resource "aws_security_group" "k3s_sg" {
-#   name        = "k3s-master-sg"
-#   description = "Security group for K3s Master Node"
-#   vpc_id      = "vpc-08854873907b3639c"
+  tags = {
+    Name        = "k3s-master-rohith"
+    Environment = "Production"
+    Role        = "K8s-Master"
+    Owner       = "Rohith"
+  }
+}
 
-#   # Rule 1: SSH (Existing)
-#   ingress {
-#     description = "SSH from World"
-#     from_port   = 22
-#     to_port     = 22
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+# Data source for Ubuntu AMI
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
 
-#   # Rule 2: K8s API from DigitalOcean
-#   ingress {
-#     description = "K8s API from DigitalOcean"
-#     from_port   = 6443
-#     to_port     = 6443
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"] # 192.168.96.0/20
-#   }
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
 
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
+  filter {
+    name   = "root-device-type"
+    values = ["ebs"]
+  }
 
-## GCP 
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+# Data source for default subnet
+data "aws_subnet" "default" {
+  availability_zone = data.aws_availability_zones.available.names[0]
+  vpc_id            = data.aws_vpc.default.id
+  default_for_az    = true
+}
+
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+# K3s Security Group
+resource "aws_security_group" "k3s_sg" {
+  name        = "k3s-master-sg"
+  description = "Security group for K3s Master Node"
+  vpc_id      = data.aws_vpc.default.id
+
+  # SSH access
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # K8s API Server
+  ingress {
+    description = "K8s API Server"
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Kubelet API
+  ingress {
+    description = "Kubelet API"
+    from_port   = 10250
+    to_port     = 10250
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # K3s agent port
+  ingress {
+    description = "K3s Agent"
+    from_port   = 6784
+    to_port     = 6785
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Database access from GCP CIDR
+  ingress {
+    description = "Database from GCP"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["10.1.0.0/16"]
+  }
+
+  # Allow all egress
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+## GCP - GKE Autopilot Cluster
 
 resource "google_container_cluster" "autopilot_cluster" {
   name             = "invincible-gke-autopilot"
-  location         = "asia-south1"
+  location         = var.gcp_region
   enable_autopilot = true
-  
-  network = "projects/${var.gcp_project_id}/global/networks/gcp-vpc-vivin"
-  subnetwork = "projects/${var.gcp_project_id}/regions/${var.gcp_region}/subnetworks/gcp-subnet-vivin"
-  deletion_protection = false 
+  deletion_protection = false
+
+  # Use the VPC created by Vivin
+  network    = "projects/${var.gcp_project_id}/global/networks/default"
+  subnetwork = "projects/${var.gcp_project_id}/regions/${var.gcp_region}/subnetworks/default"
+
+  # Release channel for stability
+  release_channel {
+    channel = "REGULAR"
+  }
+
+  # Enable necessary monitoring
+  logging_service    = "logging.googleapis.com/kubernetes"
+  monitoring_service = "monitoring.googleapis.com/kubernetes"
+
+  # Labels for organization
+  resource_labels = {
+    environment = "production"
+    owner       = "rohith"
+    phase       = "2"
+  }
 }
 
 # provider "digitalocean" {

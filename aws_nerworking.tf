@@ -43,6 +43,12 @@ resource "aws_route" "to_gcp_vpc" {
 
 # VPN EC2 endpoint (StrongSwan) 
 
+# Create EC2 Key Pair for SSH access
+resource "aws_key_pair" "ec2_key" {
+  key_name   = "ec2-virginia"
+  public_key = var.ssh_public_key
+}
+
 data "aws_ami" "ubuntu_2204" {
   most_recent = true
   owners      = ["099720109477"]
