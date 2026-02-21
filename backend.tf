@@ -1,10 +1,8 @@
 terraform {
   backend "s3" {
-    bucket         = "invincible-cloud-terraform-state" # Bucket name
+    bucket         = "invincible-cloud-terraform-state-asia" # Bucket name
     key            = "terraformroh.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "invincible-cloud-lock-table"
+    region         = "ap-south-1"
     encrypt        = true
-    profile        = "account_a"
   }
 }
