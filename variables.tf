@@ -1,12 +1,12 @@
 variable "key_name" {
-  description = "vivinsEC2"
+  description = "EC2"
   type        = string
 }
 
 variable "aws_availability_zone" {
   type        = string
   description = "AWS AZ for the public subnet"
-  default     = "ap-south-1a"
+  default     = "us-east-1a"
 }
 
 variable "gcp_vpc_cidr" {
@@ -67,4 +67,51 @@ variable "gcp_machine_type" {
   type        = string
   description = "GCP machine type (e2-micro is usually free tier eligible)"
   default     = "e2-micro"
+}
+
+variable "gcp_region" {
+  type        = string
+  description = "GCP region"
+  default     = "asia-south1"
+}
+
+variable "gcp_project_id" {
+  type        = string
+  description = "GCP Project ID"
+}
+
+variable "db_instance_class" {
+  type        = string
+  description = "AWS RDS instance class"
+  default     = "db.t3.micro"
+}
+
+variable "db_allocated_storage" {
+  type        = number
+  description = "AWS RDS allocated storage in GB"
+  default     = 20
+}
+
+variable "db_name" {
+  type        = string
+  description = "Database name"
+  default     = "appdb"
+}
+
+variable "db_username" {
+  type        = string
+  description = "Database master username"
+  default     = "postgres"
+}
+
+variable "db_password" {
+  type        = string
+  description = "Database master password"
+  sensitive   = true
+}
+
+variable "gcp_db_password" {
+  type        = string
+  description = "GCP Cloud SQL master password"
+  sensitive   = true
 }

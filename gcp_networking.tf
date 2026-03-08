@@ -1,12 +1,12 @@
 # 1. Create the VPC
 resource "google_compute_network" "gcp_vpc" {
-  name                    = "gcp-vpc-vivin"
-  auto_create_subnetworks = false 
+  name                    = "gcp-vpc"
+  auto_create_subnetworks = false
 }
 
 # 2. Create the Subnet
 resource "google_compute_subnetwork" "gcp_subnet" {
-  name          = "gcp-subnet-vivin"
+  name          = "gcp-subnet"
   ip_cidr_range = "10.1.1.0/24"
   region        = "asia-south1"
   network       = google_compute_network.gcp_vpc.id
@@ -15,12 +15,12 @@ resource "google_compute_subnetwork" "gcp_subnet" {
 #  VPN VM endpoint (StrongSwan) 
 
 resource "google_compute_address" "gcp_vpn" {
-  name   = "gcp-vpn-ip-vivin"
+  name   = "gcp-vpn-ip"
   region = var.gcp_region
 }
 
 resource "google_compute_firewall" "gcp_allow_ssh" {
-  name    = "allow-ssh-vivin"
+  name    = "allow-ssh"
   network = google_compute_network.gcp_vpc.name
 
   allow {
@@ -33,7 +33,7 @@ resource "google_compute_firewall" "gcp_allow_ssh" {
 }
 
 resource "google_compute_firewall" "gcp_allow_ipsec" {
-  name    = "allow-ipsec-vivin"
+  name    = "allow-ipsec"
   network = google_compute_network.gcp_vpc.name
 
   allow {
@@ -51,7 +51,7 @@ resource "google_compute_firewall" "gcp_allow_ipsec" {
 }
 
 resource "google_compute_firewall" "gcp_allow_icmp" {
-  name    = "allow-icmp-from-aws-vivin"
+  name    = "allow-icmp-from-aws"
   network = google_compute_network.gcp_vpc.name
 
   allow {
@@ -68,7 +68,7 @@ data "google_compute_image" "ubuntu_2204" {
 }
 
 resource "google_compute_instance" "gcp_vpn" {
-  name         = "gcp-vpn-vivin"
+  name         = "gcp-vpn"
   machine_type = var.gcp_machine_type
   zone         = var.gcp_zone
 
@@ -158,7 +158,13 @@ resource "google_compute_instance" "gcp_vpn" {
     sysctl -w net.ipv4.ip_forward=1
     echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-gcp-vpn.conf
 
-    # 6. RESTART AND VERIFY
+    apt-get install -y iptables-persistent
+
+    iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+    iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+    netfilter-persistent save 2>/dev/null || iptables-save > /etc/iptables/rules.v4
+
     systemctl restart strongswan-starter
     sleep 2
     ipsec status
@@ -168,10 +174,10 @@ resource "google_compute_instance" "gcp_vpn" {
 }
 
 resource "google_compute_route" "to_aws_vpc" {
-  name             = "route-to-aws-vpc-vivin"
-  network          = google_compute_network.gcp_vpc.name
-  dest_range       = "10.0.0.0/16"
-  priority         = 1000
-  next_hop_instance = google_compute_instance.gcp_vpn.self_link
+  name                   = "route-to-aws-vpc"
+  network                = google_compute_network.gcp_vpc.name
+  dest_range             = "10.0.0.0/16"
+  priority               = 1000
+  next_hop_instance      = google_compute_instance.gcp_vpn.self_link
   next_hop_instance_zone = var.gcp_zone
 }

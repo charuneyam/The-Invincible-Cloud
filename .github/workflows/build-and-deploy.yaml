@@ -82,7 +82,7 @@ jobs:
       - name: Get K3s kubeconfig
         run: |
           EC2_IP=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=k3s-master-rohith" \
+            --filters "Name=tag:Name,Values=k3s-master" \
                       "Name=instance-state-name,Values=running" \
             --query 'Reservations[0].Instances[0].PublicIpAddress' \
             --output text)
@@ -199,7 +199,7 @@ jobs:
       - name: Get K3s kubeconfig
         run: |
           EC2_IP=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=k3s-master-rohith" \
+            --filters "Name=tag:Name,Values=k3s-master" \
                       "Name=instance-state-name,Values=running" \
             --query 'Reservations[0].Instances[0].PublicIpAddress' \
             --output text)

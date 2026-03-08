@@ -9,32 +9,9 @@ output "k3s_master_private_ip" {
   description = "K3s Master Node Private IP"
 }
 
-# AWS RDS Database Outputs (temporarily commented - RDS not in use)
-# output "aws_rds_endpoint" {
-#   value       = try(aws_db_instance.postgres.endpoint, "")
-#   description = "AWS RDS Postgres endpoint"
-# }
-#
-# output "aws_rds_address" {
-#   value       = try(aws_db_instance.postgres.address, "")
-#   description = "AWS RDS Postgres address"
-# }
-#
-# output "aws_rds_port" {
-#   value       = try(aws_db_instance.postgres.port, 5432)
-#   description = "AWS RDS Postgres port"
-# }
-#
-# output "aws_rds_database_name" {
-#   value       = try(aws_db_instance.postgres.db_name, "appdb")
-#   description = "AWS RDS database name"
-# }
-#
-# output "aws_rds_master_username" {
-#   value       = try(aws_db_instance.postgres.username, "postgres")
-#   description = "AWS RDS master username"
-#   sensitive   = true
-# }
+output "aws_rds_endpoint" {
+  value = aws_db_instance.postgres.endpoint
+}
 
 # GCP Outputs
 output "gcp_gke_cluster_name" {

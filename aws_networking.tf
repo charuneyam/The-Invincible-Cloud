@@ -2,7 +2,7 @@
 resource "aws_vpc" "aws_main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
-  tags = { Name = "aws-vpc-vivin" }
+  tags                 = { Name = "aws-vpc" }
 }
 
 # 2. Create the Internet Gateway 
@@ -36,16 +36,16 @@ resource "aws_route_table_association" "aws_assoc" {
 resource "aws_route" "to_gcp_vpc" {
   route_table_id         = aws_route_table.aws_rt.id
   destination_cidr_block = "10.1.0.0/16"
-  
+
   # Change instance_id to network_interface_id
-  network_interface_id   = aws_instance.aws_vpn.primary_network_interface_id
+  network_interface_id = aws_instance.aws_vpn.primary_network_interface_id
 }
 
 # VPN EC2 endpoint (StrongSwan) 
 
 # Create EC2 Key Pair for SSH access
 resource "aws_key_pair" "ec2_key" {
-  key_name   = "ec2-virginia"
+  key_name   = "ec2-virginia-v2"
   public_key = var.ssh_public_key
 }
 
@@ -65,12 +65,12 @@ data "aws_ami" "ubuntu_2204" {
 }
 
 resource "aws_key_pair" "vpn_key" {
-  key_name   = "vivin-vpn-key"
+  key_name   = "vpn-key"
   public_key = var.ssh_public_key
 }
 
 resource "aws_security_group" "aws_vpn_sg" {
-  name        = "aws-vpn-sg-vivin"
+  name        = "aws-vpn-sg"
   description = "Allow SSH + IPsec for StrongSwan"
   vpc_id      = aws_vpc.aws_main.id
 
@@ -124,11 +124,11 @@ resource "aws_security_group" "aws_vpn_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = { Name = "aws-vpn-sg-vivin" }
+  tags = { Name = "aws-vpn-sg" }
 }
 
 resource "aws_security_group" "aws_k8s_master_sg" {
-  name        = "aws-k8s-master-sg-vivin"
+  name        = "aws-k8s-master-sg"
   description = "Allow SSH and Kubernetes API from GCP"
   vpc_id      = aws_vpc.aws_main.id
 
@@ -155,13 +155,13 @@ resource "aws_security_group" "aws_k8s_master_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = { Name = "aws-k8s-master-sg-vivin" }
+  tags = { Name = "aws-k8s-master-sg" }
 }
 
 # Reserve a static public IP up front (lets GCP reference it without cycles).
 resource "aws_eip" "aws_vpn" {
   domain = "vpc"
-  tags   = { Name = "aws-vpn-eip-vivin" }
+  tags   = { Name = "aws-vpn-eip" }
 }
 
 resource "aws_instance" "aws_vpn" {
@@ -214,14 +214,23 @@ resource "aws_instance" "aws_vpn" {
               sysctl -w net.ipv4.ip_forward=1
               printf 'net.ipv4.ip_forward=1\n' > /etc/sysctl.d/99-ipsec.conf
 
+              apt-get install -y iptables
+
+              iptables -t mangle -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+              iptables -A FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+              echo "iptables-restore < /etc/iptables/rules.v4" >> /etc/rc.local || true
+              mkdir -p /etc/iptables
+              iptables-save > /etc/iptables/rules.v4
+
               systemctl enable --now strongswan-starter || true
               systemctl restart strongswan-starter || true
               EOF
 
-  tags = { Name = "aws-vpn-vivin" }
+  tags = { Name = "aws-vpn" }
 }
 
-resource "aws_instance" "aws_k8s_master" {
+resource "aws_instance" "k3s_master" {
   ami                         = data.aws_ami.ubuntu_2204.id
   instance_type               = "t3.micro"
   subnet_id                   = aws_subnet.aws_pub_subnet.id
@@ -229,7 +238,12 @@ resource "aws_instance" "aws_k8s_master" {
   key_name                    = aws_key_pair.vpn_key.key_name
   associate_public_ip_address = true
 
-  tags = { Name = "aws-k8s-master-vivin" }
+  user_data = <<-EOF
+              #!/bin/bash
+              curl -sfL https://get.k3s.io | sh -
+              EOF
+
+  tags = { Name = "aws-k8s-master" }
 }
 
 resource "aws_eip_association" "aws_vpn" {

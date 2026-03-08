@@ -1,7 +1,7 @@
 # GCP-specific Helm values
 # Use with: helm install -f values.yaml -f values-gcp.yaml invincible-app ./k8s/charts/invincible-app
 
-gcpDbHost: "rohith-task2-postgres"  # Private IP or internal DNS
+gcpDbHost: "postgres"  # Private IP or internal DNS
 gcpDbPort: "5432"
 
 image:

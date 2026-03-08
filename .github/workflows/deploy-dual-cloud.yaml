@@ -83,7 +83,7 @@ jobs:
         run: |
           # Get the EC2 instance public IP
           EC2_IP=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=k3s-master-rohith" "Name=instance-state-name,Values=running" \
+            --filters "Name=tag:Name,Values=k3s-master" "Name=instance-state-name,Values=running" \
             --query 'Reservations[0].Instances[0].PublicIpAddress' \
             --output text)
           
