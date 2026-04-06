@@ -109,11 +109,3 @@ terraform init
 terraform apply
 
 ```
-
-## Roadmap
-
-- [x] AWS EKS Cluster
-- [x] GKE cluster autopilot mode
-- [ ] EKS multi-region cluster using Global Accelerator
-- [ ] GKE multi-region cluster using MCS (Multi Cluster Service)
-- [ ] Multi-cloud load balancing with failover
